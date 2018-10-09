@@ -1,4 +1,1 @@
-# IBP_Yeast
-Yeast
-
-Hello!
+Bioinformatics project: ethanol tolerance in yeast
