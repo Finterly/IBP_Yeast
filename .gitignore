@@ -1,3 +1,7 @@
-# Ignore excel data
+# Excel data
 *.xlsx
 *.XLS
+
+# R data and history
+*.RData
+*.Rhistory
