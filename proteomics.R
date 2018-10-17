@@ -2,10 +2,12 @@ library(tidyverse)
 library(openxlsx)
 
 # Reading in excel workbook
-proteomics_data <- loadWorkbook('results_yeast_analysis.xlsx')
+proteomics_data = loadWorkbook('results_yeast_analysis.xlsx')
 
 # Renaming sheets to removes spaces in names
-sheetNames <- sheets(proteomics_data)
+sheetNames = sheets(proteomics_data)
+sheetNames = lapply(sheetNames, trimws) # Trimming away trailing space
+
 newSheetNames = c()
 for (sheetName in sheetNames) {
   sheetName = gsub(" ", "_", sheetName)
@@ -18,4 +20,5 @@ for(i in 1:length(sheetNames))
 {
   assign(sheetNames[i],readWorkbook(proteomics_data,sheet = i))
 }
+
 
