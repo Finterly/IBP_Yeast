@@ -1,6 +1,7 @@
 # Excel data
 *.xlsx
 *.XLS
+*.xls
 
 # R data and history
 *.RData
