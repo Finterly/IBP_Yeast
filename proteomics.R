@@ -24,17 +24,19 @@ for(i in 1:length(sheetNames))
   assign(sheetNames[i],readWorkbook(proteomics_data,sheet = i))
 }
 
-S2 = S2_ANC_6pers_vs_YPD[,c(1,2,3,4,5,6,20,27)]
-S2_cut = S2_ANC_6pers_vs_YPD[,c(1,2,20,27)]
-ggpairs(S2_cut)
 
-
+# Create list of out dataframes (except for GO_BP_analysis)
 data_frame_list = list(S1 = S1_all_6perc_vs_all_YPD, S2 = S2_ANC_6pers_vs_YPD, S3 = S3_77_6pers_vs_YPD, 
-                       S4 = S4_78_6pers_vs_YPD, S5 = S5_79_6perc_vs_YPD, S6 = S6_86_6perc_vs_YPD,
-                       S7 = S7_87_6perc_vs_YPD, S8_88_6perc_vs_YPD)
-data_frame_list = data_frame_list[2]
+                    S4 = S4_78_6pers_vs_YPD, S5 = S5_79_6perc_vs_YPD, S6 = S6_86_6perc_vs_YPD,
+                    S7 = S7_87_6perc_vs_YPD, S8_88_6perc_vs_YPD)
 
-#basic statistics
+# Changes Significance column to boolean in all data frames
+data_frame_list = lapply(data_frame_list, function(df) {
+  df$Significant = as.factor(!(is.na(df$Significant)))
+  df
+})
+
+#Basic statistics plots
 for (i in 1:8){
   data = get(sheetNames[i])
   data_cut = data[,c(1,2,20,27)]
@@ -43,6 +45,3 @@ for (i in 1:8){
   ggpairs(data_cut)+ggtitle(graph_name)
   dev.off()
 }
-
-
-
