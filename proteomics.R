@@ -1,5 +1,6 @@
 library(tidyverse)
 library(openxlsx)
+library(ggplot2)
 library(GGally)
 
 getwd()
@@ -19,8 +20,7 @@ for (sheetName in sheetNames) {
 sheetNames = newSheetNames
 
 # Assigning each sheet to a dataframe
-for(i in 1:length(sheetNames))
-{
+for(i in 1:length(sheetNames)){
   assign(sheetNames[i],readWorkbook(proteomics_data,sheet = i))
 }
 
@@ -88,7 +88,6 @@ downregulatedProtein_S8_88_6perc_vs_YPD   #19
 
 
 
-
 ##combine up/down regulated proteins 
 for (i in 1:8){
   listNameUpregulated = paste("upregulatedProtein", sheetNames[i], sep = "_")
@@ -115,31 +114,53 @@ for (i in 3:8){
   listReacterName = paste("significantProtein", sheetNames[i], sep = "_")
   reacterName = get(listReacterName)
   listSharedSignificantProtein = paste("sharedSignificantProtein", sheetNames[i], sep = "_")
+  listUniqueSignificantProtein = paste("uniqueSignificantProtein", sheetNames[i], sep = "_")
   if((length(reacterName$Majority.protein.IDs))!=0){
-    sharedSignificantProtein = intersect(significantProtein_S1_all_6perc_vs_all_YPD, reacterName, 
-                                         by = "Majority.protein.IDs")
+    sharedSignificantProtein = intersect(significantProtein_S2_ANC_6pers_vs_YPD, reacterName)
+    uniqueSignificantProtein = setdiff(significantProtein_S2_ANC_6pers_vs_YPD, reacterName)
     assign(listSharedSignificantProtein, sharedSignificantProtein)
+    assign(listUniqueSignificantProtein, uniqueSignificantProtein)
   }
 }
 
-sharedSignificantProtein_S4_78_6pers_vs_YPD  #72 (63+9)
-sharedSignificantProtein_S6_86_6perc_vs_YPD  #55 (52+3)
-sharedSignificantProtein_S7_87_6perc_vs_YPD  #36 (33+3)
-sharedSignificantProtein_S8_88_6perc_vs_YPD  #95 (81+14)
-
+sharedSignificantProtein_S4_78_6pers_vs_YPD  #77 (67+10)
+sharedSignificantProtein_S6_86_6perc_vs_YPD  #58 (54+4)
+sharedSignificantProtein_S7_87_6perc_vs_YPD  #34 (32+2)
+sharedSignificantProtein_S8_88_6perc_vs_YPD  #79 (70+9)
+uniqueSignificantProtein_S4_78_6pers_vs_YPD  #52 (29+23)
+uniqueSignificantProtein_S6_86_6perc_vs_YPD  #71 (42+29)
+uniqueSignificantProtein_S7_87_6perc_vs_YPD  #95 (64+31)
+uniqueSignificantProtein_S8_88_6perc_vs_YPD  #50 (26+24)
 
 ##co-shared significant proteins (evolved vs ancester)
 cosharedSignificantProtein_fermentor3 = sharedSignificantProtein_S4_78_6pers_vs_YPD
+uniqueSignificantProtein_fermentor3 = uniqueSignificantProtein_S4_78_6pers_vs_YPD
+
 cosharedSignificantProtein_fermentor4 = intersect(sharedSignificantProtein_S6_86_6perc_vs_YPD,
                                                   sharedSignificantProtein_S7_87_6perc_vs_YPD, 
                                                   sharedSignificantProtein_S8_88_6perc_vs_YPD)
-cosharedSignificantProtein = intersect(cosharedSignificantProtein_fermentor3, cosharedSignificantProtein_fermentor4)
+significantProtein_fermentor4 = rbind(significantProtein_S6_86_6perc_vs_YPD, significantProtein_S7_87_6perc_vs_YPD, significantProtein_S8_88_6perc_vs_YPD)
+uniqueSignificantProtein_fermentor4 = setdiff(significantProtein_fermentor4, cosharedSignificantProtein_fermentor4)
+uniqueSignificantProtein_fermentor4[order(c("up", "down"))]
+uniqueSignificantProtein_fermentor4[c("Significant", "Majority.protein.IDs")]
 
-cosharedSignificantProtein_fermentor3 #72 (63+9)
-cosharedSignificantProtein_fermentor4 #32 (31+1)
-cosharedSignificantProtein            #31 (30+1)
-summary(compare(cosharedSignificantProtein, cosharedSignificantProtein_fermentor4, by = "Majority.protein.IDs"))#difference
+
+cosharedSignificantProtein_fermentor3 #77 (67+10)
+cosharedSignificantProtein_fermentor4 #31 (30+1)
+cosharedSignificantProtein_total      #30 (29+1)
+
+uniqueSignificantProtein_fermentor3  #52 (29+23)
+uniqueSignificantProtein_fermentor4  #99 (86+13)
+#setdiff(cosharedSignificantProtein, cosharedSignificantProtein_fermentor4) #difference
 ### fermentor3 has all significant protein in fermentor4, except upregulated P14065 
+
+
+
+#export data as excel
+write.xlsx((cosharedSignificantProtein_fermentor3),"cosharedSignificantProtein_fermentor3.xlsx")
+write.xlsx((cosharedSignificantProtein_fermentor4),"cosharedSignificantProtein_fermentor4.xlsx")
+write.xlsx((uniqueSignificantProtein_fermentor3),"uniqueSignificantProtein_fermentor3")
+write.xlsx((uniqueSignificantProtein_fermentor4),"uniqueSignificantProtein_fermentor4")
 
 
 
